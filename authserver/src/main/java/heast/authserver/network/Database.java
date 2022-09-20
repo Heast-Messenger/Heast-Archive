@@ -1,12 +1,8 @@
 package heast.authserver.network;
 
-import com.mysql.cj.exceptions.ExceptionInterceptor;
-import com.mysql.cj.exceptions.ExceptionInterceptorChain;
-import com.mysql.cj.jdbc.Blob;
 import heast.core.network.UserAccount;
 import heast.core.security.Keychain;
 
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

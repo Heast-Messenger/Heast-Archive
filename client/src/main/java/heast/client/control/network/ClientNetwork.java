@@ -1,11 +1,13 @@
 package heast.client.control.network;
 
+import heast.client.view.WelcomeView;
 import heast.core.security.Keychain;
 import heast.core.security.RSA;
 import io.netty.channel.Channel;
 import heast.core.network.ClientConnection;
 import heast.core.network.c2s.*;
 import heast.core.utility.Validator;
+import javafx.application.Platform;
 
 import java.math.BigInteger;
 
@@ -67,14 +69,21 @@ public final class ClientNetwork {
         }
         this.passwordCypher=password.getBytes();
 
-        keychain= RSA.INSTANCE.genKeyPair();    //TODO: Different thread and loading-screen!!!
-        System.out.println("Keychain generated");
+        Thread genKeys= new Thread(()->{
+            keychain= RSA.INSTANCE.genKeyPair();
+            Platform.runLater(()->{
+                WelcomeView.LoadingPane.INSTANCE.changeLabel("keychain generated");
+            });
+            System.out.println("Keychain generated");
+            connection.send(
+                    new SignupC2SPacket(
+                            username, address, password, keychain, serverPublicKey, serverModulus
+                    )
+            );
+        });
 
-        connection.send(
-            new SignupC2SPacket(
-                username, address, password, keychain, serverPublicKey, serverModulus
-            )
-        );
+        WelcomeView.LoadingPane.INSTANCE.changeLabel("generating keychain");
+        genKeys.start();
     }
 
     public void deleteAccount(String email){
@@ -143,7 +152,6 @@ public final class ClientNetwork {
         }
 
         System.out.println("Verifying Account with code: " + verificationCode + "...");
-
         connection.send(
             new VerificationC2SPacket(verificationCode, serverPublicKey, serverModulus)
         );

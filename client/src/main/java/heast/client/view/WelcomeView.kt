@@ -18,6 +18,7 @@ import heast.client.view.utility.FontManager
 import javafx.scene.control.Label
 
 object WelcomeView : StackPane() {
+
 	init {
 		setPane(WelcomePane)
 	}
@@ -102,10 +103,16 @@ object WelcomeView : StackPane() {
 						this.opacity = 0.5
 					},
 
-					FontManager.regularLabel("Your verification-code will be sent to your email.", 16.0).apply {
+					FontManager.regularLabel("loading-text", 16.0).apply {
 						this.opacity = 0.5
 					}
 			)
+		}
+
+		fun changeLabel(label : String){
+			this.children[3]= FontManager.regularLabel(label, 16.0).apply {
+				this.opacity = 0.5
+			}
 		}
 	}
 
@@ -156,6 +163,7 @@ object WelcomeView : StackPane() {
 						ClientNetwork.INSTANCE.reset(
 							emailField.text, passwordField.text
 						)
+						LoadingPane.changeLabel("Your verification-code will be sent to your email.")
 						Dialog.show(LoadingPane, WelcomeView)
 						clearFields()
 					}.apply {
@@ -169,6 +177,7 @@ object WelcomeView : StackPane() {
 							emailField.text,
 							passwordField.text
 						)
+						LoadingPane.changeLabel("Your verification-code will be sent to your email.")
 						Dialog.show(LoadingPane, WelcomeView)
 						clearFields()
 					}.apply {
@@ -249,6 +258,7 @@ object WelcomeView : StackPane() {
 							emailField.text,
 							passwordField.text
 						)
+						LoadingPane.changeLabel("Your verification-code will be sent to your email.")
 						Dialog.show(LoadingPane, WelcomeView)
 						clearFields()
 					}.apply {
@@ -321,6 +331,7 @@ object WelcomeView : StackPane() {
 						ClientNetwork.INSTANCE.verify(
 							verificationField.text.uppercase()
 						)
+						LoadingPane.changeLabel("Verifying Account with code: " + verificationField.text.uppercase() + "...")
 						verificationField.text=""
 					}.apply {
 						this.alignment = Pos.CENTER
@@ -338,6 +349,7 @@ object WelcomeView : StackPane() {
 					"/heast/client/images/misc/back.png"
 				)) {
 					Dialog.close(this@VerificationPane, WelcomeView)
+					Dialog.close(LoadingPane, WelcomeView)
 				}.apply {
 					this.alignment = Pos.CENTER
 				}

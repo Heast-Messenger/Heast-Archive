@@ -6,3 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# ignore connections
+database-connection.txt
+email-connection.txt

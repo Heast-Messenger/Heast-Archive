@@ -43,10 +43,12 @@ public final class ClientAuthHandler implements ClientAuthListener {
 
             case INVALID_CREDENTIALS -> {
                 System.out.println("Server: Invalid credentials");
+                Platform.runLater(() -> Dialog.INSTANCE.close(WelcomeView.LoadingPane.INSTANCE,WelcomeView.INSTANCE));
             }
 
             case USER_NOT_FOUND -> {
                 System.out.println("Server: User not found");
+                Platform.runLater(() -> Dialog.INSTANCE.close(WelcomeView.LoadingPane.INSTANCE,WelcomeView.INSTANCE));
             }
         }
     }
@@ -70,10 +72,12 @@ public final class ClientAuthHandler implements ClientAuthListener {
 
             case INVALID_CREDENTIALS -> {
                 System.out.println("Server: Invalid credentials");
+                Platform.runLater(() -> Dialog.INSTANCE.close(WelcomeView.LoadingPane.INSTANCE,WelcomeView.INSTANCE));
             }
 
             case USER_EXISTS -> {
                 System.out.println("Server: User already exists");
+                Platform.runLater(() -> Dialog.INSTANCE.close(WelcomeView.LoadingPane.INSTANCE,WelcomeView.INSTANCE));
             }
         }
     }
