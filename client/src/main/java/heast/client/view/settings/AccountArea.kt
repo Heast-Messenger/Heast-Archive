@@ -115,7 +115,7 @@ object AccountArea : VBox() {
 							FontManager.boldLabel("", 16.0).apply {
 								this.textProperty().bind(
 									Bindings.createObjectBinding({
-										val publicKey : String = Settings.account.value?.publicKey?.toString()
+										val publicKey : String = Settings.account.value?.keychain?.publicKey?.toString()
 											?: "A very long number"
 										return@createObjectBinding "${
 											publicKey.substring(0..min(20, publicKey.length - 1))

@@ -1,16 +1,27 @@
 package heast.chatserver;
 
 import heast.chatserver.network.ServerChatHandler;
+import heast.chatserver.network.ServerNetwork;
 import heast.core.network.*;
+import heast.core.security.AES;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.util.Arrays;
+
 public final class Server {
 
     public static void main(String... args){
+/*        //test aes
+        String s1= "Hello World _ - 0987654321!/&%$$%&/()=";
+        byte[] encrypted=AES.INSTANCE.encrypt(s1.getBytes(),"xyz".getBytes());
+        byte[] decrypted=AES.INSTANCE.decrypt(encrypted, "xyz".getBytes());
+        String s2= new String(decrypted);
+        System.out.println(s2);
+*/
         int port = args.length > 0
                 ? Integer.parseInt(args[0])
                 : 6969;
@@ -32,6 +43,7 @@ public final class Server {
                                     .addLast(new ChannelHandlerAdapter() {
                                         @Override
                                         public void channelActive(ChannelHandlerContext ctx) {
+                                            ServerNetwork.initialize();
                                             System.out.println("Server active!");
                                         }
 

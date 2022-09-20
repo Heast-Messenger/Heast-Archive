@@ -1,5 +1,7 @@
 package heast.client.control.network;
 
+import heast.core.security.Keychain;
+import heast.core.security.RSA;
 import io.netty.channel.Channel;
 import heast.core.network.ClientConnection;
 import heast.core.network.c2s.*;
@@ -11,14 +13,17 @@ public final class ClientNetwork {
 
     public static final ClientNetwork INSTANCE = new ClientNetwork();
 
+
+    public Keychain keychain;           //needs to be pulled from Database
     public ClientConnection connection;         //connection to the auth-server
     public ClientConnection chatConnection;     //connection to the chat-server
-    public byte[] symmetricKey;
+    public byte[] passwordCypher;              //password as byte[]
 
     public BigInteger serverPublicKey;//auth-server rn
     public BigInteger serverModulus;//auth-server rn
 
     public void initialize() {
+
         System.out.println("Initializing client network...");
     }
 
@@ -60,10 +65,14 @@ public final class ClientNetwork {
             System.err.println("Invalid password");
             return;
         }
+        this.passwordCypher=password.getBytes();
+
+        keychain= RSA.INSTANCE.genKeyPair();    //TODO: Different thread and loading-screen!!!
+        System.out.println("Keychain generated");
 
         connection.send(
             new SignupC2SPacket(
-                username, address, password, serverPublicKey, serverModulus
+                username, address, password, keychain, serverPublicKey, serverModulus
             )
         );
     }
@@ -94,6 +103,7 @@ public final class ClientNetwork {
             return;
         }
 
+        this.passwordCypher=password.getBytes();
         connection.send(
             new LoginC2SPacket(
                 address, password, serverPublicKey, serverModulus
@@ -115,6 +125,7 @@ public final class ClientNetwork {
             return;
         }
 
+        this.passwordCypher=newPassword.getBytes();
         connection.send(
             new ResetC2SPacket(address, newPassword, serverPublicKey, serverModulus)
         );

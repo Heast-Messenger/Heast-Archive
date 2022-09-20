@@ -1,13 +1,22 @@
 package heast.authserver.network;
 
+import com.mysql.cj.exceptions.ExceptionInterceptor;
+import com.mysql.cj.exceptions.ExceptionInterceptorChain;
+import com.mysql.cj.jdbc.Blob;
 import heast.core.network.UserAccount;
+import heast.core.security.Keychain;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 
 public final class Database {
 
@@ -26,7 +35,7 @@ public final class Database {
 
         try {
             String[] parts = Files.readString(
-                Path.of("C:\\Users\\Admin\\Documents\\Very Secure Folder\\database-connection.txt")
+                Path.of("C:\\Users\\fabia\\Documents\\Very Secure Folder\\database-connection.txt")
             ).split(",");
 
             try {
@@ -47,18 +56,23 @@ public final class Database {
      * @param email The email address of the user.
      * @param password The hashed password of the account.
      */
-    public static boolean addEntry(String name, String email, String password) {    //TODO: Doesn't work if table is fully cleared?
+    public static boolean addEntry(String name, String email, String password, byte[] privateKey, String publicKey, String modulus) {    //TODO: Doesn't work if table is fully cleared?
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO accounts (name, since, email, password) VALUES (?, ?, ?, ?)");
+            BufferedInputStream byteStream= new BufferedInputStream(new ByteArrayInputStream(privateKey));
+
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO accounts (name, since, email, password, private_key, public_key, modulus) VALUES (?, ?, ?, ?, ?, ?, ?)");
             stmt.setString(1, name);
             stmt.setString(2, LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             ));
             stmt.setString(3, email);
             stmt.setString(4, password);
+            stmt.setBinaryStream(5, byteStream, byteStream.available());
+            stmt.setString(6, publicKey);
+            stmt.setString(7, modulus);
             stmt.execute();
             return true;
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             System.err.println("Failed to add entry to database for " + email);
             return false;
         }
@@ -116,20 +130,28 @@ public final class Database {
             stmt.setString(1, email);
             ResultSet result = stmt.executeQuery();
             if (result.next()) {
+                final HashMap<String, BigInteger> keys = new HashMap<>();
+                keys.put("private", null);
+                keys.put("public", new BigInteger(result.getString("public_key")));
+                keys.put("modulus", new BigInteger(result.getString("modulus")));
+                Keychain keychain= new Keychain(keys);
+
+                BufferedInputStream bs= new BufferedInputStream(result.getBinaryStream("private_key"));
+
+                keychain.setSecret(bs.readAllBytes());
+
                 return new UserAccount(
                     result.getInt("id"),
                     result.getString("name"),
                     result.getString("email"),
                     result.getString("password"),
                     LocalDateTime.parse(result.getString("since"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                    null,
-                    null,
-                    null
+                    keychain
                 );
             } else {
                 return null;
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             System.err.println("No entry found in database for " + email);
             return null;
         }

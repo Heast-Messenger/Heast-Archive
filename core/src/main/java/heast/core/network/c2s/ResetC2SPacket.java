@@ -36,13 +36,13 @@ public final class ResetC2SPacket implements Packet<ServerAuthListener> {
 
     @Override
     public void write(PacketBuf buf) {
-        buf.writeBytesEncryptRSA(new String(email),publicKey,modulus);
-        buf.writeBytesEncryptRSA(new String(newPassword),publicKey,modulus);
+        buf.writeBytesEncryptRSA(email,publicKey,modulus);
+        buf.writeBytesEncryptRSA(newPassword,publicKey,modulus);
     }
 
     public void decrypt(BigInteger privateKey, BigInteger modulus){
-        this.email= RSA.INSTANCE.decrypt(this.email,privateKey,modulus);
-        this.newPassword= RSA.INSTANCE.decrypt(this.newPassword,privateKey,modulus);
+        this.email= RSA.INSTANCE.decryptLargeBytes(this.email,privateKey,modulus);
+        this.newPassword= RSA.INSTANCE.decryptLargeBytes(this.newPassword,privateKey,modulus);
     }
 
     @Override

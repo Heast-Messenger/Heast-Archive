@@ -1,82 +1,23 @@
 package heast.core.network;
 
+import heast.core.security.Keychain;
 import io.netty.buffer.ByteBuf;
 import heast.core.security.AES;
 import heast.core.security.RSA;
 import heast.core.utility.ByteBufImpl;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class PacketBuf extends ByteBufImpl {
 
     public PacketBuf(ByteBuf buf) {
         super(buf);
-    }
-
-    /**
-     * Encrypts this packet with the given symmetric AES key.
-     * @param symmetricKey The symmetric key to encrypt with.
-     */
-    public void encrypt(final byte[] symmetricKey) {
-        byte[] bytes = new byte[readableBytes()];
-        getBytes(0, bytes);
-        byte[] encrypted = AES.INSTANCE.encrypt(
-            bytes, symmetricKey
-        );
-        if (encrypted != null) {
-            setBytes(0, encrypted);
-        } else {
-            throw new RuntimeException("Encryption failed.");
-        }
-    }
-
-    /**
-     * Decrypts this packet with the given symmetric AES key.
-     * @param symmetricKey The symmetric key to decrypt with.
-     */
-    public void decrypt(final byte[] symmetricKey) {
-        byte[] bytes = new byte[readableBytes()];
-        getBytes(0, bytes);
-        byte[] decrypted = AES.INSTANCE.decrypt(
-            bytes, symmetricKey
-        );
-        if (decrypted != null) {
-            setBytes(0, decrypted);
-        } else {
-            throw new IllegalStateException("Decryption failed.");
-        }
-    }
-
-    /**
-     * Encrypts this packet with the given asymmetric public RSA key.
-     * @param publicKey The public key to encrypt with.
-     * @param modulus The modulus to encrypt with.
-     */
-    public void encrypt(final BigInteger publicKey, final BigInteger modulus) {
-        byte[] bytes = new byte[readableBytes()];
-        getBytes(0, bytes);
-        System.out.println(new String(bytes));
-        byte[] encrypted = RSA.INSTANCE.encrypt(
-            bytes, publicKey, modulus
-        );
-        setBytes(0, encrypted);
-    }
-
-    /**
-     * Decrypts this packet with the given asymmetric private RSA key.
-     * @param privateKey The private key to decrypt with.
-     * @param modulus The modulus to decrypt with.
-     */
-    public void decrypt(final BigInteger privateKey, final BigInteger modulus) {
-        byte[] bytes = new byte[readableBytes()];
-        getBytes(0, bytes);
-        byte[] decrypted = RSA.INSTANCE.decrypt(
-            bytes, privateKey, modulus
-        );
-        setBytes(0, decrypted);
     }
 
     /**
@@ -88,7 +29,7 @@ public class PacketBuf extends ByteBufImpl {
     public void writeVarInt(int value) {
         while ((value & -128) != 0) {
             writeByte(value & 127 | 128);
-            value >>>= 7;   //what tha seven doin?
+            value >>>= 7;   //7 because a byte has 8 bits
         }
         writeByte(value);
     }
@@ -125,15 +66,15 @@ public class PacketBuf extends ByteBufImpl {
             writeVarInt(-1);
         }
     }
+
     /**
-     * Writes a by RSA encrypted string of any length to the buffer.
+     * Writes a by RSA encrypted byte array of any length to the buffer.
      * @param str The string to write.
-     *
      * @see #readBytes() to read the String back (as raw Data).
      */
-    public void writeBytesEncryptRSA(final String str, BigInteger e,BigInteger n){
+    public void writeBytesEncryptRSA(final byte[] str, BigInteger e,BigInteger n){
         if (str != null) {
-            final byte[] data= RSA.INSTANCE.encrypt(str.getBytes(),e,n);
+            byte[] data=RSA.INSTANCE.encryptLargeBytes(str,e,n);
 
             writeVarInt(data.length);
             writeBytes(data);
@@ -160,7 +101,7 @@ public class PacketBuf extends ByteBufImpl {
      * Reads an encrypted String of any length from the buffer.
      * @return The data read.
      *
-     * @see #writeBytesEncryptRSA(String,BigInteger,BigInteger) to write the string to the buffer.
+     * @see #writeBytesEncryptRSA to write the string to the buffer.
      */
     public byte[] readBytes() {
         int len = readVarInt();
@@ -173,6 +114,15 @@ public class PacketBuf extends ByteBufImpl {
             return data;
         } else {
             return null;
+        }
+    }
+
+    public void writePlainBytes(byte[] bytes){
+        if (bytes != null) {
+            writeVarInt(bytes.length);
+            writeBytes(bytes);
+        } else {
+            writeVarInt(-1);
         }
     }
 
@@ -314,13 +264,14 @@ public class PacketBuf extends ByteBufImpl {
     public void writeUser(final UserAccount user) {
         if (user != null) {
             writeVarInt(user.getId());
+            writeRSAKey(user.getKeychain().getPublicKey());
+            writeRSAKey(user.getKeychain().getPrivateKey());
+            writeRSAKey(user.getKeychain().getModulus());
+            writePlainBytes(user.getKeychain().getSecret());
             writeString(user.getUsername());
             writeString(user.getEmail());
             writeString(user.getPassword());
             writeTimestamp(user.getSince());
-            writeRSAKey(user.getPublicKey());
-            writeRSAKey(user.getPrivateKey());
-            writeRSAKey(user.getModulus());
         } else {
             writeVarInt(-1);
         }
@@ -333,8 +284,20 @@ public class PacketBuf extends ByteBufImpl {
     public final UserAccount readUser() {
         int id = readVarInt();
         if (id != -1) {
+            final HashMap<String, BigInteger> keys = new HashMap<>();
+            keys.put("public", readRSAKey());
+            keys.put("private", readRSAKey());
+            keys.put("modulus", readRSAKey());
+
+            Keychain keychain= new Keychain(keys);
+            keychain.setSecret(readBytes());
+
+            String s1= readString();
+            String s2= readString();
+            String s3= readString();
+
             return new UserAccount(
-                id, readString(), readString(), readString(), readTimestamp(), readRSAKey(), readRSAKey(), readModulus()
+                id, s1, s2, s3, readTimestamp(), keychain
             );
         }  else {
             return null;

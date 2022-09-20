@@ -33,11 +33,11 @@ public final class VerificationC2SPacket implements Packet<ServerAuthListener> {
 
     @Override
     public void write(PacketBuf buf) {
-        buf.writeBytesEncryptRSA(new String(verificationCode),publicKey,modulus);
+        buf.writeBytesEncryptRSA(verificationCode,publicKey,modulus);
     }
 
     public void decrypt(BigInteger privateKey, BigInteger modulus){
-        this.verificationCode= RSA.INSTANCE.decrypt(this.verificationCode,privateKey,modulus);
+        this.verificationCode= RSA.INSTANCE.decryptLargeBytes(this.verificationCode,privateKey,modulus);
     }
 
     @Override

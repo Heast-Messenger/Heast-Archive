@@ -1,6 +1,7 @@
 package heast.core.network;
 
-import java.math.BigInteger;
+import heast.core.security.Keychain;
+
 import java.time.LocalDateTime;
 
 public final class UserAccount {
@@ -9,20 +10,16 @@ public final class UserAccount {
     public final String email;
     public final String password;
     public final LocalDateTime since;
-    public final BigInteger publicKey;
-    public final BigInteger privateKey;
-    public final BigInteger modulus;
+    public Keychain keychain;
     public final String avatar;
 
-    public UserAccount(int id, String username, String email, String password, LocalDateTime since, BigInteger publicKey, BigInteger privateKey, BigInteger modulus) {
+    public UserAccount(int id, String username, String email, String password, LocalDateTime since, Keychain keychain) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.since = since;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        this.modulus = modulus;
+        this.keychain= keychain;
         this.avatar = "http://localhost:8000/avatars?id=" + id;
     }
 
@@ -46,16 +43,8 @@ public final class UserAccount {
         return since;
     }
 
-    public BigInteger getPublicKey() {
-        return publicKey;
-    }
-
-    public BigInteger getPrivateKey() {
-        return privateKey;
-    }
-
-    public BigInteger getModulus() {
-        return modulus;
+    public Keychain getKeychain(){
+        return this.keychain;
     }
 
     public String getAvatar() {
@@ -64,6 +53,6 @@ public final class UserAccount {
 
     @Override
     public String toString() {
-        return "UserAccount{" + "id=" + id + ", username='" + username + '\'' + ", email='" + email + '\'' + ", password='" + password + '\'' + ", since=" + since + ", publicKey=" + publicKey + ", privateKey=" + privateKey + ", modulus=" + modulus + ", avatar='" + avatar + '\'' + '}';
+        return "UserAccount{" + "id=" + id + ", username='" + username + '\'' + ", email='" + email + '\'' + ", password='" + password + '\'' + ", since=" + since + ", publicKey=" + keychain.getPublicKey() + ", privateKey=" + keychain.getPrivateKey() + ", modulus=" + keychain.getModulus() + ", secret=" + new String(keychain.getSecret()) + ", avatar='" + avatar + '\'' + '}';
     }
 }

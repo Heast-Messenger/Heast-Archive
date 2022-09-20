@@ -8,6 +8,8 @@ import javafx.stage.Stage
 import heast.client.control.network.ClientNetwork
 import heast.client.model.Internal
 import heast.client.model.Settings
+import heast.core.network.c2s.LoginC2SPacket
+import heast.core.network.c2s.ServerKeyC2SPacket
 import javafx.scene.Parent
 
 object ClientGui {

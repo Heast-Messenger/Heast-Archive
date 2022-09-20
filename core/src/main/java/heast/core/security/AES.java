@@ -59,8 +59,7 @@ public final class AES {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return Base64.getEncoder()
-                .encodeToString(cipher.doFinal(str))
-                .getBytes();
+                .encode(cipher.doFinal(str));
         } catch (Exception e) {
             System.out.println("Error while encrypting: " + e);
         }
@@ -78,9 +77,8 @@ public final class AES {
             SecretKeySpec secretKey = getKeySpec(secret);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder()
-                .decode(str)))
-                .getBytes();
+            return cipher.doFinal(Base64.getDecoder()
+                .decode(str));
         } catch (Exception e) {
             System.out.println("Error while decrypting: " + e);
             return null;

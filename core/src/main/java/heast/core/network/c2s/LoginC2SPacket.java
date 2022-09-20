@@ -35,8 +35,8 @@ public class LoginC2SPacket implements Packet<ServerAuthListener> {
 
     @Override
     public void write(PacketBuf buf) {
-        buf.writeBytesEncryptRSA(new String(email),publicKey,modulus);
-        buf.writeBytesEncryptRSA(new String(password),publicKey,modulus);
+        buf.writeBytesEncryptRSA(email,publicKey,modulus);
+        buf.writeBytesEncryptRSA(password,publicKey,modulus);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class LoginC2SPacket implements Packet<ServerAuthListener> {
     }
 
     public void decrypt(BigInteger privateKey, BigInteger modulus){
-        this.email= RSA.INSTANCE.decrypt(this.email,privateKey,modulus);
-        this.password= RSA.INSTANCE.decrypt(this.password,privateKey,modulus);
+        this.email= RSA.INSTANCE.decryptLargeBytes(this.email,privateKey,modulus);
+        this.password= RSA.INSTANCE.decryptLargeBytes(this.password,privateKey,modulus);
     }
     public String getEmail() {
         return new String(this.email);

@@ -5,7 +5,11 @@ import heast.core.network.c2s.*;
 import heast.core.network.c2s.listener.ServerAuthListener;
 import heast.core.network.ClientConnection;
 import heast.core.network.s2c.*;
+import heast.core.security.AES;
+import heast.core.security.Keychain;
 import heast.core.utility.Validator;
+
+import java.util.Arrays;
 
 public final class ServerAuthHandler implements ServerAuthListener {
 
@@ -63,6 +67,9 @@ public final class ServerAuthHandler implements ServerAuthListener {
         String uname = buf.getUsername();
         String email = buf.getEmail();
         String password = buf.getPassword();
+        byte[] privateKey = buf.getPrivateKey();
+        String publicKey = buf.getPublicKey().toString();
+        String modulus = buf.getModulus().toString();
 
         if (!Validator.isUsernameValid(uname) ||
             !Validator.isEmailValid(email) ||
@@ -86,7 +93,7 @@ public final class ServerAuthHandler implements ServerAuthListener {
             connection, email, () -> connection.send(new SignupResponseS2CPacket(
                 SignupResponseS2CPacket.Status.CODE_SENT
             )), () -> {
-                boolean successful = ServerNetwork.registerClient(uname, email, password);
+                boolean successful = ServerNetwork.registerClient(uname, email, password, privateKey, publicKey, modulus);
                 if (successful) {
                     connection.send(new SignupResponseS2CPacket(
                         SignupResponseS2CPacket.Status.OK
@@ -198,6 +205,7 @@ public final class ServerAuthHandler implements ServerAuthListener {
                 System.out.println("Verification successful");
                 connection.onVerificationCode();
             } else {
+                System.out.println(verificationCode+" - "+connection.getVerificationCode());
                 System.err.println("Verification failed");
             }
         }

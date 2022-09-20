@@ -2,12 +2,16 @@ package heast.client.control.network;
 
 import heast.client.view.ClientGui;
 import heast.client.view.dialog.Dialog;
+import heast.core.security.AES;
 import javafx.application.Platform;
 import heast.client.model.Settings;
 import heast.client.view.WelcomeView;
 import heast.core.network.ClientConnection;
 import heast.core.network.s2c.*;
 import heast.core.network.s2c.listener.ClientAuthListener;
+
+import java.math.BigInteger;
+import java.util.Objects;
 
 public final class ClientAuthHandler implements ClientAuthListener {
 
@@ -23,6 +27,9 @@ public final class ClientAuthHandler implements ClientAuthListener {
             case OK -> {
                 System.out.println("Server: Logged in!");
                 Platform.runLater(() -> {
+                    byte[] privateKey= buf.getUser().getKeychain().getSecret();
+                    buf.getUser().getKeychain().setPrivateKey(new BigInteger(Objects.requireNonNull(AES.INSTANCE.decrypt(privateKey, ClientNetwork.INSTANCE.passwordCypher))));
+                    ClientNetwork.INSTANCE.keychain=buf.getUser().getKeychain();
                     Settings.INSTANCE.getAccount().set(buf.getUser());
                 });
             }

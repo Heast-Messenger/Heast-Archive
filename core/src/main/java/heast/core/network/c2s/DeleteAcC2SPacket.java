@@ -32,12 +32,12 @@ public class DeleteAcC2SPacket implements Packet<ServerAuthListener> {
         }
 
         public void decrypt(BigInteger privateKey, BigInteger modulus){
-            this.email= RSA.INSTANCE.decrypt(this.email,privateKey,modulus);
+            this.email= RSA.INSTANCE.decryptLargeBytes(this.email,privateKey,modulus);
         }
 
         @Override
         public void write(PacketBuf buf) {
-            buf.writeBytesEncryptRSA(new String(email),publicKey,modulus);
+            buf.writeBytesEncryptRSA(email,publicKey,modulus);
         }
 
         @Override
