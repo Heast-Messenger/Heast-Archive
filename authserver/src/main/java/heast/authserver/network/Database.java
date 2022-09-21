@@ -40,7 +40,6 @@ public final class Database {
                 );
             } catch (SQLException e) {
                 System.err.println("Failed to connect to database");
-                e.printStackTrace();
             }
             createDatabase();
         } catch (IOException e) {
@@ -69,8 +68,7 @@ public final class Database {
             );
 
         } catch (SQLException e) {
-            System.err.println("Database already exists.");
-            e.printStackTrace();
+            System.err.println("Error generating database");
         }
     }
 
