@@ -36,7 +36,7 @@ public final class Database {
 
             try {
                 connection = DriverManager.getConnection(
-                    "jdbc:mysql://" + parts[0] + ":" + parts[1] + "/" /*+ parts[2] */ + "?user=" + parts[3] + "&password=" + parts[4]
+                    "jdbc:mysql://" + parts[0] + ":" + parts[1] + "/" + "?user=" + parts[3] + "&password=" + parts[4]
                 );
             } catch (SQLException e) {
                 System.err.println("Failed to connect to database");
@@ -57,7 +57,7 @@ public final class Database {
             statement.execute("USE messenger");
             statement.execute("CREATE TABLE IF NOT EXISTS accounts ("
                     + "id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,"
-                    + "username VARCHAR(32) NOT NULL,"
+                    + "name VARCHAR(32) NOT NULL,"
                     + "since DATETIME NOT NULL,"
                     + "email VARCHAR(255) NOT NULL,"
                     + "password VARCHAR(255) NOT NULL,"
