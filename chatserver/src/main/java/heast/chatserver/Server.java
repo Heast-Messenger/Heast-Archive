@@ -1,5 +1,6 @@
 package heast.chatserver;
 
+import heast.chatserver.network.Database;
 import heast.chatserver.network.ServerChatHandler;
 import heast.chatserver.network.ServerNetwork;
 import heast.core.network.*;
@@ -44,6 +45,7 @@ public final class Server {
                                         @Override
                                         public void channelActive(ChannelHandlerContext ctx) {
                                             ServerNetwork.initialize();
+                                            Database.initialize();
                                             System.out.println("Server active!");
                                         }
 

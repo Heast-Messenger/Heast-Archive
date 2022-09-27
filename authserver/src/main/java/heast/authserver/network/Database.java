@@ -80,7 +80,7 @@ public final class Database {
      * @param email The email address of the user.
      * @param password The hashed password of the account.
      */
-    public static boolean addEntry(String name, String email, String password, byte[] privateKey, String publicKey, String modulus) {    //TODO: Doesn't work if table is fully cleared?
+    public static boolean addEntry(String name, String email, String password, byte[] privateKey, String publicKey, String modulus) {
         try {
             BufferedInputStream byteStream= new BufferedInputStream(new ByteArrayInputStream(privateKey));
 

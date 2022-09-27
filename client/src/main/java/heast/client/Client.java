@@ -16,27 +16,39 @@ import heast.client.view.ClientGui;
 import heast.client.control.network.ClientAuthHandler;
 import heast.client.control.network.ClientNetwork;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public final class Client {
 	private final String host;
 	private final int port;
 
-	public static void main(String... args) {
-		String host = args.length > 0
-			? args[0]
-			: "localhost";
+	public static void main(String... args){
+		try {
+			Properties prop = new Properties();
+			FileInputStream ip = new FileInputStream("client/src/main/resources/heast/client/config/config.properties");
+			prop.load(ip);
 
-		int port = args.length > 1
-			? Integer.parseInt(args[1])
-			: 8080;
+			String host = prop.getProperty("authIP");
+			int port = Integer.parseInt(prop.getProperty("port"));
 
-		Client client= new Client(host, port);
-		//client.connectToChatServer("localhost",6969);	//needs to be on a different thread
+			Client client = new Client(host, port);
 
-		Runnable runnable = () -> { client.connectToChatServer("localhost",6969); };
-		Thread thread = new Thread(runnable);
-		thread.start();
+			//client.connectToChatServer("localhost",6969);	//needs to be on a different thread
 
-		client.start();
+			Runnable runnable = () -> {
+				client.connectToChatServer("localhost", 6969);
+			};
+			Thread thread = new Thread(runnable);
+			thread.start();
+
+			client.start();
+		}
+		catch (IOException e){
+			System.out.println("config.properties is wrong");
+			e.printStackTrace();
+		}
 	}
 
 	public Client(String host, int port) {
