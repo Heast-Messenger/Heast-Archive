@@ -1,7 +1,8 @@
 package heast.chatserver.permissionengine.permissions.identifications;
 
 public enum MessagePermissions {
-    DELETE(0), EDIT(1);
+    DELETEMESSAGE(0), EDITMESSAGE(1), CREATECHANNEL(2),
+    DELETECHANNEL(3), EDITCHANNEL(4);
 
     private int id;
 

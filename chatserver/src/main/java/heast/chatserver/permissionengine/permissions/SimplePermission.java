@@ -2,18 +2,18 @@ package heast.chatserver.permissionengine.permissions;
 
 public class SimplePermission implements Permission {
     private String name;
-    private String readableName;
+    private String description;
     private int id;
 
     public SimplePermission(String name, String readableName, int id) {
         this.name = name;
-        this.readableName = readableName;
+        this.description = readableName;
         this.id = id;
     }
 
     @Override
-    public String getReadableName() {
-        return this.readableName;
+    public String getDescription() {
+        return this.description;
     }
 
     @Override

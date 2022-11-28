@@ -1,0 +1,28 @@
+{
+  "Permissions":
+  {
+    "Targeted" :
+    [
+      {
+        "name" : "MyPermission0",
+        "id" : 0,
+        "description" : "MyPermission"
+      },
+      {
+        "name" : "MyPermission1",
+        "id" : 1,
+        "description" : "MyPermission"
+      }
+    ],
+
+    "Global":
+    [
+
+    ],
+
+    "Channel":
+    [
+
+    ]
+  }
+}

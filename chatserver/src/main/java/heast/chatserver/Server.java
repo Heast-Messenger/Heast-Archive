@@ -3,6 +3,7 @@ package heast.chatserver;
 import heast.chatserver.network.Database;
 import heast.chatserver.network.ServerChatHandler;
 import heast.chatserver.network.ServerNetwork;
+import heast.chatserver.permissionengine.PermissionHandler;
 import heast.core.network.*;
 import heast.core.security.AES;
 import io.netty.bootstrap.ServerBootstrap;
@@ -46,6 +47,7 @@ public final class Server {
                                         public void channelActive(ChannelHandlerContext ctx) {
                                             ServerNetwork.initialize();
                                             Database.initialize();
+                                            PermissionHandler.initialize();
                                             System.out.println("Server active!");
                                         }
 

@@ -7,7 +7,7 @@ package heast.chatserver.permissionengine.permissions;
  * @see PermissionTarget
  */
 public interface TargetPermission extends Permission {
-    String getReadableName();
+    String getDescription();
     String getName();
     int getID();
     PermissionTarget getTarget();

@@ -1,7 +1,8 @@
 package heast.chatserver.permissionengine.permissions.identifications;
 
 public enum VoicePermissions {
-    MUTE(8), DEAFEN(9), KICK(10);
+    CREATECHANNEL(5), DELETECHANNEL(6), EDITCHANNEL(7),
+    MUTEUSER(8), DEAFENUSER(9), KICKUSER(10);
 
     private int id;
 

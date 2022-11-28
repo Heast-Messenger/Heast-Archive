@@ -2,20 +2,20 @@ package heast.chatserver.permissionengine.permissions;
 
 public class SimpleTargetPermission implements TargetPermission {
     private String name;
-    private String readableName;
+    private String description;
     private int id;
     private PermissionTarget target;
 
-    public SimpleTargetPermission(String name, String readableName, int id, PermissionTarget target) {
+    public SimpleTargetPermission(String name, String desription, int id, PermissionTarget target) {
         this.name = name;
-        this.readableName = readableName;
+        this.description = desription;
         this.id = id;
         this.target = target;
     }
 
     @Override
-    public String getReadableName() {
-        return this.readableName;
+    public String getDescription() {
+        return this.description;
     }
 
     @Override

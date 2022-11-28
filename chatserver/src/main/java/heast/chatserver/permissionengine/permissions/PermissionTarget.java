@@ -24,4 +24,13 @@ public enum PermissionTarget {
     {
         this.id = id;
     }
+
+    public static PermissionTarget getTarget(int id){
+        switch (id){
+            case 0: return PermissionTarget.SELF;
+            case 1: return PermissionTarget.OTHER;
+            case 2: return PermissionTarget.ALL;
+            default: return PermissionTarget.SELF;
+        }
+    }
 }
